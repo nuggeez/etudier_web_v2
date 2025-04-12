@@ -145,6 +145,7 @@ export default function Page() {
             className="hidden"
             multiple
             onChange={handleFileChange}
+            accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, text/plain, application/pdf, image/*"
           />
         </label>
       </div>

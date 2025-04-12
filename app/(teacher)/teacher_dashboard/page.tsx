@@ -70,20 +70,26 @@ export default function Page() {
         <HeaderNavbar />
         <h1 className="text-4xl font-bold">Stats</h1>
         <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-8 p-8 border border-gray-300 shadow bg-gray-50 rounded-3xl">
+          <Link
+            href={"/teacher_modules"}
+            className="flex flex-col gap-8 p-8 border border-gray-300 shadow bg-gray-50 rounded-3xl justify-between transition-all delay-0 duration-300 hover:-translate-y-2 cursor-pointer"
+          >
             <ChartBar size={64} />
             <div className="flex flex-col">
               <h1 className="text-gray-500 text-lg">Modules created</h1>
               <p className="font-black text-3xl">{modulesCount}</p>
             </div>
-          </div>
-          <div className="flex flex-col gap-8 p-8 border border-gray-300 shadow bg-gray-50 rounded-3xl">
+          </Link>
+          <Link
+            href={"/teacher_quiz"}
+            className="flex flex-col gap-8 p-8 border border-gray-300 shadow bg-gray-50 rounded-3xl justify-between transition-all delay-0 duration-300 hover:-translate-y-2 cursor-pointer"
+          >
             <ChartArea size={64} />
             <div className="flex flex-col">
               <h1 className="text-gray-500 text-lg">Quiz created</h1>
               <p className="font-black text-3xl">{quizCount}</p>
             </div>
-          </div>
+          </Link>
         </div>
         <h1 className="text-4xl font-bold">Create</h1>
         <div className="grid grid-cols-2 gap-4">
