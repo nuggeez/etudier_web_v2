@@ -21,8 +21,6 @@ export default function Page() {
   const user = pocketbase_instance.authStore.record!;
 
   const [isInitialized, setIsInitialized] = useState(false);
-  const [modulesCount, setModulesCount] = useState(0);
-  const [quizCount, setQuizCount] = useState(0);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -38,32 +36,11 @@ export default function Page() {
       } else if (user && user.record.account_type == "Teacher") {
         router.replace("/student_dashboard/");
       }
-    };
-    const checkCounts = async () => {
-      try {
-        const quizCount = await pocketbase_instance
-          .collection("quiz")
-          .getList(1, 50, {
-            filter: `student_id = '${user!.id}'`,
-          });
 
-        const modulesCount = await pocketbase_instance
-          .collection("modules")
-          .getList(1, 50, {
-            filter: `student_id = '${user!.id}'`,
-          });
-
-        setQuizCount(quizCount.items.length);
-        setModulesCount(modulesCount.items.length);
-        setIsInitialized(true);
-      } catch (err) {
-        console.error(err);
-        setIsInitialized(true);
-      }
+      setIsInitialized(true);
     };
 
     checkSession();
-    checkCounts();
   }, []);
 
   if (isInitialized) {

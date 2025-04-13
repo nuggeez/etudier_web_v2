@@ -12,15 +12,41 @@ import {
   LoaderPinwheel,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const router = useRouter();
   const user = pocketbase_instance.authStore.record!;
 
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [modulesCount, setModulesCount] = useState(0);
-  const [quizCount, setQuizCount] = useState(0);
+  const { data, error, refetch } = useQuery({
+    queryKey: ["teacher_dashboard"],
+    queryFn: async () => {
+      try {
+        const quizCount = await pocketbase_instance
+          .collection("quiz")
+          .getList(1, 50, {
+            filter: `teacher_id = '${user!.id}'`,
+          });
+
+        const modulesCount = await pocketbase_instance
+          .collection("modules")
+          .getList(1, 50, {
+            filter: `teacher_id = '${user!.id}'`,
+          });
+
+        return {
+          quizCount: quizCount.items.length,
+          modulesCount: modulesCount.items.length,
+        };
+      } catch (err) {
+        console.error(err);
+        return err;
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
     const checkSession = async () => {
@@ -37,34 +63,11 @@ export default function Page() {
         router.replace("/teacher_dashboard/");
       }
     };
-    const checkCounts = async () => {
-      try {
-        const quizCount = await pocketbase_instance
-          .collection("quiz")
-          .getList(1, 50, {
-            filter: `teacher_id = '${user!.id}'`,
-          });
-
-        const modulesCount = await pocketbase_instance
-          .collection("modules")
-          .getList(1, 50, {
-            filter: `teacher_id = '${user!.id}'`,
-          });
-
-        setQuizCount(quizCount.items.length);
-        setModulesCount(modulesCount.items.length);
-        setIsInitialized(true);
-      } catch (err) {
-        console.error(err);
-        setIsInitialized(true);
-      }
-    };
 
     checkSession();
-    checkCounts();
   }, []);
 
-  if (isInitialized) {
+  if (data) {
     return (
       <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4">
         <HeaderNavbar />
@@ -77,7 +80,7 @@ export default function Page() {
             <ChartBar size={64} />
             <div className="flex flex-col">
               <h1 className="text-gray-500 text-lg">Modules created</h1>
-              <p className="font-black text-3xl">{modulesCount}</p>
+              <p className="font-black text-3xl">{data.modulesCount!}</p>
             </div>
           </Link>
           <Link
@@ -87,7 +90,7 @@ export default function Page() {
             <ChartArea size={64} />
             <div className="flex flex-col">
               <h1 className="text-gray-500 text-lg">Quiz created</h1>
-              <p className="font-black text-3xl">{quizCount}</p>
+              <p className="font-black text-3xl">{data.quizCount!}</p>
             </div>
           </Link>
         </div>

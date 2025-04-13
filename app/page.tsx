@@ -4,6 +4,7 @@ import pocketbase_instance from "@/app/lib/pocketbase";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LoaderPinwheel } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,6 +12,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const validateForm = () => {
     if (!email || !password) {
@@ -59,66 +62,78 @@ export default function LoginPage() {
 
       if (user && user.record.account_type == "Student") {
         router.replace("/student_dashboard/");
+        return;
       } else if (user && user.record.account_type == "Teacher") {
         router.replace("/teacher_dashboard/");
+        return;
       }
+
+      setIsInitialized(true);
     };
 
     checkSession();
   }, []);
 
-  return (
-    <main className="flex flex-col min-h-screen max-w-3xl justify-center mx-auto px-4">
-      <div className="flex flex-row bg-zinc-100 border border-gray-200 shadow rounded-3xl p-8 gap-8 items-center">
-        <div className="basis-[50%] flex flex-col gap-2">
-          <h1 className="text-5xl font-black">etudier</h1>
-          <p>
-            Your tasks, notes, and quizzes are waiting. Sign in to pick up where
-            you left off—or join thousands of learners and doers who organize
-            smarter every day.
-          </p>
-        </div>
-
-        <form className="basis-[50%] flex flex-col gap-4">
-          <h1 className="font-black text-xl">Login</h1>
-
-          <input
-            className="input validator"
-            type="email"
-            required
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <input
-            className="input validator"
-            type="password"
-            required
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <Link className="text-blue-600 underline text-sm" href="/register">
-            Don&apos;t have an account?
-          </Link>
-
-          {error && (
-            <p className="text-red-500 text-sm p-4 rounded-3xl bg-gray-200">
-              {error}
+  if (isInitialized) {
+    return (
+      <main className="flex flex-col min-h-screen max-w-3xl justify-center mx-auto px-4">
+        <div className="flex flex-row bg-zinc-100 border border-gray-200 shadow rounded-3xl p-8 gap-8 items-center">
+          <div className="basis-[50%] flex flex-col gap-2">
+            <h1 className="text-5xl font-black">etudier</h1>
+            <p>
+              Your tasks, notes, and quizzes are waiting. Sign in to pick up
+              where you left off—or join thousands of learners and doers who
+              organize smarter every day.
             </p>
-          )}
+          </div>
 
-          <button
-            className="btn btn-soft btn-dash btn-success btn-md"
-            onClick={handleLogin}
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-      </div>
+          <form className="basis-[50%] flex flex-col gap-4">
+            <h1 className="font-black text-xl">Login</h1>
+
+            <input
+              className="input validator"
+              type="email"
+              required
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <input
+              className="input validator"
+              type="password"
+              required
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <Link className="text-blue-600 underline text-sm" href="/register">
+              Don&apos;t have an account?
+            </Link>
+
+            {error && (
+              <p className="text-red-500 text-sm p-4 rounded-3xl bg-gray-200">
+                {error}
+              </p>
+            )}
+
+            <button
+              className="btn btn-soft btn-dash btn-success btn-md"
+              onClick={handleLogin}
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4 items-center justify-center">
+      <LoaderPinwheel className="animate-spin" size={64} />
     </main>
   );
 }

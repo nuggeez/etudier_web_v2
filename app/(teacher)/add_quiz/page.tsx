@@ -7,14 +7,14 @@ import { useEffect, useState } from "react";
 import { LoaderPinwheel, Plus, ShieldAlert, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { RecordModel } from "pocketbase";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const router = useRouter();
   const user = pocketbase_instance.authStore.record!;
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const [modules, setModules] = useState<RecordModel[]>([]);
-  const [moduleID, setModuleID] = useState<string | null>(null);
+  const [moduleID, setModuleID] = useState<string | null>("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState([]);
@@ -23,19 +23,23 @@ export default function Page() {
 
   const [posting, setPosting] = useState(false);
 
-  useEffect(() => {
-    const fetchModules = async () => {
-      const { items } = await pocketbase_instance
-        .collection("modules")
-        .getList(1, 50, { filter: `teacher_id="${user.id}"` });
+  const { data: modules, refetch } = useQuery({
+    queryKey: ["teacher_add_quiz"],
+    queryFn: async () => {
+      try {
+        const { items } = await pocketbase_instance
+          .collection("modules")
+          .getList(1, 50, { filter: `teacher_id="${user.id}"` });
 
-      setModules(items);
-      setIsInitialized(true);
-      console.log(items);
-    };
-
-    fetchModules();
-  }, [user.id]);
+        return items;
+      } catch (err) {
+        console.error(err);
+        return err;
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
 
   const addQuestion = () => {
     setQuestions([
@@ -86,7 +90,7 @@ export default function Page() {
     }
   };
 
-  if (isInitialized) {
+  if (modules) {
     return (
       <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4">
         <HeaderNavbar />

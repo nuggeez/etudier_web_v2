@@ -3,29 +3,31 @@ import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
 import Link from "next/link";
 
-import { useEffect, useState } from "react";
 import { AlertCircle, FilePlus2, LoaderPinwheel } from "lucide-react";
-import { RecordModel } from "pocketbase";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const user = pocketbase_instance.authStore.record!;
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [quiz, setQuizzes] = useState<RecordModel[]>([]);
 
-  useEffect(() => {
-    const getQuiz = async () => {
-      const { items } = await pocketbase_instance
-        .collection("quiz")
-        .getList(1, 50, { filter: `teacher_id = '${user!.id}'` });
+  const { data: quiz } = useQuery({
+    queryKey: ["teacher_quiz"],
+    queryFn: async () => {
+      try {
+        const { items } = await pocketbase_instance
+          .collection("quiz")
+          .getList(1, 50, { filter: `teacher_id = '${user!.id}'` });
 
-      setIsInitialized(true);
-      setQuizzes(items);
-    };
+        return items;
+      } catch (err) {
+        console.error(err);
+        return err;
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
 
-    getQuiz();
-  }, []);
-
-  if (isInitialized) {
+  if (quiz) {
     return (
       <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4">
         <HeaderNavbar />

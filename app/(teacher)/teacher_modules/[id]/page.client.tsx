@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import HeaderNavbar from "../../components/HeaderNavbar";
 import pocketbase_instance from "@/app/lib/pocketbase";
@@ -5,33 +6,30 @@ import Link from "next/link";
 
 import { ArrowLeft, Download, Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ClientComponent({ data }: { data: any }) {
   const router = useRouter();
   const user = pocketbase_instance.authStore.record;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [files, setFiles] = useState<any[]>();
-
-  useEffect(() => {
-    const getFilesUrl = async () => {
+  const { data: files } = useQuery({
+    queryKey: [data.id],
+    queryFn: async () => {
       const temp = [];
       for (const file of data.contents) {
         const url = pocketbase_instance.files.getURL(data, file);
         temp.push({ url: url, title: url.split("/").pop() });
       }
 
-      console.log(temp);
 
-      setFiles(temp);
-    };
-
-    console.log(data);
-
-    getFilesUrl();
-  }, [data]);
+      return {
+        thumbnail_url: pocketbase_instance.files.getURL(data, data.thumbnail),
+        files: temp,
+      };
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <>
@@ -46,15 +44,30 @@ export default function ClientComponent({ data }: { data: any }) {
           <Edit size={24} onClick={() => {}} className="cursor-pointer" />
         )}
       </div>
-      <div className="flex flex-col">
-        <h1 className="font-bold text-3xl">{data.title}</h1>
-        {data.description && <p className="text-sm">{data.description}</p>}
+      <div className="grid grid-cols-2 gap-8">
+        {files && (
+          <img
+            src={
+              files.thumbnail_url ||
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg_ITtT5GMZ-5j9ybW17fpwAOm3Lg0hdzNcw&s"
+            }
+            className="w-full aspect-square rounded-3xl object-cover shadow-md"
+          />
+        )}
+
+        <div className="flex flex-col">
+          <h1 className="font-bold text-3xl">{data.title}</h1>
+          {data.description && (
+            <p className="text-sm text-gray-500">{data.description}</p>
+          )}
+        </div>
       </div>
+
       <h1 className="text-3xl font-black">Resources</h1>
       <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
         {files &&
-          files?.length > 0 &&
-          files.map((file: { title: string; url: string }, index) => (
+          files?.files.length > 0 &&
+          files.files.map((file: any, index: any) => (
             <Link
               href={file.url}
               key={index}
