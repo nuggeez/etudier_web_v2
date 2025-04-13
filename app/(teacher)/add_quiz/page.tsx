@@ -18,7 +18,6 @@ export default function Page() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState([]);
-  const [visibility, setVisibility] = useState();
   const [errorMessage, setErrorMessage] = useState();
 
   const [posting, setPosting] = useState(false);
@@ -65,7 +64,7 @@ export default function Page() {
     setQuestions(updated);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (visibility: boolean) => {
     if (!title || questions.length === 0) {
       alert("Please fill all fields and add at least one question.");
       return;
@@ -96,44 +95,16 @@ export default function Page() {
         <HeaderNavbar />
         <h1 className="text-3xl font-black">Quiz details</h1>
         <div className="flex flex-col bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl gap-4">
-          <div className="grid grid-cols-2 gap-4 items-center">
-            <label className="floating-label">
-              <span>Quiz title</span>
-              <input
-                type="text"
-                placeholder="Module title"
-                className="input input-lg"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </label>
-            <div className="flex flex-col gap-2">
-              <h1 className="font-bold">Quiz visibility</h1>
-              <div className="flex flex-row gap-4">
-                <div className="flex flex-row gap-2 items-center">
-                  <input
-                    type="radio"
-                    name="visibility"
-                    checked={visibility}
-                    onChange={() => setVisibility(true)}
-                    className="radio radio-sm"
-                  />
-                  <p>Visible</p>
-                </div>
-
-                <div className="flex flex-row gap-2 items-center">
-                  <input
-                    type="radio"
-                    name="visibility"
-                    checked={!visibility}
-                    onChange={() => setVisibility(false)}
-                    className="radio radio-sm"
-                  />
-                  <p>Invisible</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <label className="floating-label">
+            <span>Quiz title</span>
+            <input
+              type="text"
+              placeholder="Module title"
+              className="input input-lg w-full"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </label>
           <textarea
             placeholder="Module description"
             className="textarea w-full resize-none text-wrap"
@@ -215,13 +186,25 @@ export default function Page() {
           </div>
         ))}
 
-        <button
-          className="btn btn-soft btn-dash btn-success btn-md"
-          disabled={posting}
-          onClick={handleSubmit}
-        >
-          {posting ? "Posting...." : "Post quiz"}
-        </button>
+        {questions.length >= 2 && (
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              className="btn btn-soft btn-dash btn-primary btn-md"
+              disabled={posting}
+              onClick={() => handleSubmit(false)}
+            >
+              {posting ? "Saving...." : "Save as draft"}
+            </button>
+            <button
+              className="btn btn-soft btn-dash btn-success btn-md"
+              disabled={posting}
+              onClick={() => handleSubmit(true)}
+            >
+              {posting ? "Posting...." : "Post quiz"}
+            </button>
+          </div>
+        )}
+
         {errorMessage && (
           <div className="flex flex-row gap-4 items-center bg-red-500 text-white p-4 rounded-3xl">
             <ShieldAlert size={24} />

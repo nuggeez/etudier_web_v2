@@ -6,6 +6,7 @@ import pocketbase_instance from "@/app/lib/pocketbase";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ShieldAlert } from "lucide-react";
+import Link from "next/link";
 
 export default function ClientComponent({ data }: { data: any }) {
   const router = useRouter();
@@ -15,6 +16,8 @@ export default function ClientComponent({ data }: { data: any }) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [score, setScore] = useState<number>(0);
+  const [percent, setPercent] = useState<number>(0);
 
   const handleSelect = (questionIndex: number, optionIndex: number) => {
     const updated = [...answers];
@@ -27,14 +30,27 @@ export default function ClientComponent({ data }: { data: any }) {
     setErrorMessage(null);
 
     try {
-      const result = await pocketbase_instance
-        .collection("quiz_submissions")
-        .create({
-          quiz_id: data.id,
-          answers: answers,
-          student_id: pocketbase_instance.authStore.record!.id,
-        });
+      const userId = pocketbase_instance.authStore.record!.id;
 
+      // Calculate score
+      let correct = 0;
+      data.quiz.forEach((q: any, i: number) => {
+        if (answers[i] === q.answer) correct++;
+      });
+
+      const percentScore = Math.round((correct / data.quiz.length) * 100);
+
+      // Save answers
+      await pocketbase_instance.collection("users_quiz_submissions").create({
+        quiz_id: data.id,
+        answers: answers,
+        user_id: userId,
+        score: correct,
+        percent: percentScore,
+      });
+
+      setScore(correct);
+      setPercent(percentScore);
       setSubmitted(true);
     } catch (error: any) {
       setErrorMessage(error.message || "Submission failed");
@@ -46,6 +62,18 @@ export default function ClientComponent({ data }: { data: any }) {
   return (
     <>
       <HeaderNavbar />
+      <div className="breadcrumbs text-sm">
+        <ul>
+          <li>
+            <Link href={"/student_dashboard"}>Home</Link>
+          </li>
+          <li>
+            <Link href={"/student_quiz"}>Quiz</Link>
+          </li>
+          <li>{data!.title}</li>
+        </ul>
+      </div>
+
       <div className="flex items-center justify-between">
         <ArrowLeft
           size={24}
@@ -72,7 +100,8 @@ export default function ClientComponent({ data }: { data: any }) {
               <button
                 key={oIndex}
                 onClick={() => handleSelect(qIndex, oIndex)}
-                className={`px-6 py-2 rounded-3xl text-left ${
+                disabled={submitted}
+                className={`px-6 py-2 rounded-3xl text-left cursor-pointer ${
                   answers[qIndex] === oIndex
                     ? "bg-blue-500 text-white"
                     : "bg-gray-100 border border-gray-300 shadow-sm"
@@ -101,9 +130,15 @@ export default function ClientComponent({ data }: { data: any }) {
           {submitting ? "Submitting..." : "Submit Answers"}
         </button>
       ) : (
-        <p className="text-green-600 font-bold mt-6">
-          Quiz submitted successfully!
-        </p>
+        <div className="mt-6 space-y-2">
+          <p className="text-green-600 font-bold">
+            Quiz submitted successfully!
+          </p>
+          <p className="text-lg">
+            Score: {score} / {data.quiz.length}
+          </p>
+          <p className="text-lg">Percentage: {percent}%</p>
+        </div>
       )}
     </>
   );

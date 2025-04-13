@@ -32,9 +32,6 @@ export default function HeaderNavbar() {
         <Link href={"/student_quiz"} className="cursor-pointer">
           Quiz
         </Link>
-        <Link href={"/student_quiz"} className="cursor-pointer">
-          Bookmarks
-        </Link>
       </nav>
 
       <nav className="flex flex-row gap-8">

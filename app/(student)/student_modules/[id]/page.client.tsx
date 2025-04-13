@@ -4,7 +4,13 @@ import HeaderNavbar from "../../components/HeaderNavbar";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import Link from "next/link";
 
-import { ArrowLeft, Bookmark, CheckCircle, Download, Edit } from "lucide-react";
+import {
+  ArrowLeft,
+  Bookmark,
+  Check,
+  CheckCheckIcon,
+  Download,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +21,7 @@ export default function ClientComponent({ data }: { data: any }) {
 
   const [percent, setPercent] = useState("0%");
   const [bookmarked, setBookmark] = useState(false);
+  const [isMarking, setIsMarking] = useState(false);
 
   const { data: files } = useQuery({
     queryKey: [data.id],
@@ -32,8 +39,8 @@ export default function ClientComponent({ data }: { data: any }) {
     },
   });
 
-  const { refetch } = useQuery({
-    queryKey: [data.id],
+  const { refetch: refetchUserProgress } = useQuery({
+    queryKey: ["usersProgress", data!.id],
     queryFn: async () => {
       try {
         const record = await pocketbase_instance
@@ -51,9 +58,71 @@ export default function ClientComponent({ data }: { data: any }) {
     },
   });
 
+  const handleMarkAsCompleted = async () => {
+    setIsMarking(true);
+    try {
+      const recordExist = await pocketbase_instance
+        .collection("users_modules_progress")
+        .getFirstListItem(
+          `user_id = '${
+            pocketbase_instance.authStore.record!.id
+          }' && module_id = '${data!.id}'`
+        );
+
+      await pocketbase_instance
+        .collection("users_modules_progress")
+        .update(recordExist.id, {
+          percent: "100%",
+        });
+      refetchUserProgress();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      await pocketbase_instance.collection("users_modules_progress").create({
+        user_id: pocketbase_instance.authStore.record!.id,
+        module_id: data!.id,
+        percent: "100%",
+      });
+      refetchUserProgress();
+    }
+    setIsMarking(false);
+  };
+
+  const handleUnmarkAsCompleted = async () => {
+    setIsMarking(true);
+    try {
+      const recordExist = await pocketbase_instance
+        .collection("users_modules_progress")
+        .getFirstListItem(
+          `user_id = '${
+            pocketbase_instance.authStore.record!.id
+          }' && module_id = '${data!.id}'`
+        );
+
+      await pocketbase_instance
+        .collection("users_modules_progress")
+        .update(recordExist.id, {
+          percent: null,
+        });
+      refetchUserProgress();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {}
+    setIsMarking(false);
+  };
+
   return (
     <>
       <HeaderNavbar />
+      <div className="breadcrumbs text-sm">
+        <ul>
+          <li>
+            <Link href={"/student_dashboard"}>Home</Link>
+          </li>
+          <li>
+            <Link href={"/student_modules"}>Modules</Link>
+          </li>
+          <li>{data!.title}</li>
+        </ul>
+      </div>
       <div className="flex flex-row items-center justify-between">
         <ArrowLeft
           size={24}
@@ -63,11 +132,25 @@ export default function ClientComponent({ data }: { data: any }) {
         {user!.account_type == "Student" && (
           <div className="flex flex-row items-center gap-4">
             <Bookmark size={24} onClick={() => {}} className="cursor-pointer" />
-            <CheckCircle
-              size={24}
-              onClick={() => {}}
-              className="cursor-pointer"
-            />
+            {percent != "100%" ? (
+              <button
+                className="btn btn-soft btn-success"
+                onClick={handleMarkAsCompleted}
+                disabled={isMarking}
+              >
+                <Check size={24} className="cursor-pointer" />
+                <p>Mark as complete</p>
+              </button>
+            ) : (
+              <button
+                className="btn btn-soft btn-success"
+                onClick={handleUnmarkAsCompleted}
+                disabled={isMarking}
+              >
+                <CheckCheckIcon size={24} className="cursor-pointer" />
+                <p>Completed</p>
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -82,8 +165,13 @@ export default function ClientComponent({ data }: { data: any }) {
           />
         )}
 
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-4">
           <h1 className="font-bold text-3xl">{data.title}</h1>
+          {data!.course && (
+            <p className="px-6 py-2 bg-gray-200 text-gray-500 w-fit rounded-3xl">
+              {data!.course}
+            </p>
+          )}
           {data.description && (
             <p className="text-sm text-gray-500">{data.description}</p>
           )}

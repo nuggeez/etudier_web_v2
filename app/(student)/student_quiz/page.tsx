@@ -59,7 +59,7 @@ export default function Page() {
                 className="bg-gray-50 border border-gray-300 shadow-md p-6 rounded-3xl gap-2 flex flex-col gap-4 transition-all delay-0 duration-300 hover:-translate-y-2"
                 key={quiz.id}
               >
-                <div>
+                <div className="flex flex-col gap-2">
                 <h1 className="font-bold text-xl">{quiz.title}</h1>
                 {quiz.course && (
                   <p className="px-6 py-2 bg-gray-200 text-gray-500 w-fit rounded-3xl">
