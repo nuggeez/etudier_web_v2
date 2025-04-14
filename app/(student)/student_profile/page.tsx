@@ -11,8 +11,8 @@ import { useState } from "react";
 export default function Page() {
   const user = pocketbase_instance.authStore.record!;
 
-  const [name, setName] = useState(user!.name);
-  const [school, setSchool] = useState(user!.school);
+  const [name, setName] = useState(user!.name || "");
+  const [school, setSchool] = useState(user!.school || "");
   const [department, setDepartment] = useState(user!.department || "");
   const [yearLevel, setYearLevel] = useState(user!.year_level || "");
 
