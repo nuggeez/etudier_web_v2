@@ -58,7 +58,7 @@ export default function Page() {
   };
 
   const deleteQuestion = (index: number) => {
-    const updated = questions.filter((_, i) => i !== index);
+    const updated = questions.filter((_: any, i: number) => i !== index);
     setQuestions(updated);
   };
 
