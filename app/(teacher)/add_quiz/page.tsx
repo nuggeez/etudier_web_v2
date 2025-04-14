@@ -20,7 +20,7 @@ export default function Page() {
 
   const [posting, setPosting] = useState(false);
 
-  const { data: modules } = useQuery({
+  const { data: modules }: { data: any } = useQuery({
     queryKey: ["teacher_add_quiz"],
     queryFn: async () => {
       try {
