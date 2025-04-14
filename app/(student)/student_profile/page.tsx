@@ -13,11 +13,11 @@ export default function Page() {
 
   const [name, setName] = useState(user ? user!.name : "");
   const [school, setSchool] = useState(user ? user!.school : "");
-  const [department, setDepartment] = useState(user!.department || "");
-  const [yearLevel, setYearLevel] = useState(user!.year_level || "");
+  const [department, setDepartment] = useState(user ? user!.department : "");
+  const [yearLevel, setYearLevel] = useState(user ? user!.year_level : "");
 
   const { data } = useQuery({
-    queryKey: ["student_profile", user!.id],
+    queryKey: ["student_profile", user ? user!.id : "user_id"],
     queryFn: async () => {
       try {
         const modules_progress = await pocketbase_instance

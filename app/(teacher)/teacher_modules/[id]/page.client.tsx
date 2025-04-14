@@ -39,7 +39,7 @@ export default function ClientComponent({ data }: { data: any }) {
           onClick={() => router.back()}
           className="cursor-pointer"
         />
-        {user!.id == data.teacher_id && (
+        {user && user.id == data.teacher_id && (
           <Edit size={24} onClick={() => {}} className="cursor-pointer" />
         )}
       </div>

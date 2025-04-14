@@ -128,7 +128,7 @@ export default function ClientComponent({ data }: { data: any }) {
           onClick={() => router.back()}
           className="cursor-pointer"
         />
-        {user!.account_type == "Student" && (
+        {user && user.account_type == "Student" && (
           <div className="flex flex-row items-center gap-4">
             <Bookmark size={24} onClick={() => {}} className="cursor-pointer" />
             {percent != "100%" ? (
