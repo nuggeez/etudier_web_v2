@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import HeaderNavbar from "../../components/HeaderNavbar";
@@ -75,7 +76,6 @@ export default function ClientComponent({ data }: { data: any }) {
           percent: "100%",
         });
       refetchUserProgress();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       await pocketbase_instance.collection("users_modules_progress").create({
         user_id: pocketbase_instance.authStore.record!.id,
@@ -104,7 +104,6 @@ export default function ClientComponent({ data }: { data: any }) {
           percent: null,
         });
       refetchUserProgress();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {}
     setIsMarking(false);
   };

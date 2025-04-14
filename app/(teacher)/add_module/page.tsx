@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
+import Link from "next/link";
 
 import { useState } from "react";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 export default function Page() {
   const router = useRouter();

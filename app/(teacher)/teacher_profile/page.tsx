@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
@@ -23,7 +24,13 @@ export default function Page() {
         year_level: yearLevel,
       });
 
-      document.getElementById("edit-profile-modal").close();
+      const modal = document.getElementById("edit-profile-modal");
+
+      if (modal instanceof HTMLDialogElement) {
+        modal.close();
+      } else {
+        console.warn("Element is not a <dialog>, can't call .close()");
+      }
     } catch (err: any) {}
   };
 
@@ -43,9 +50,15 @@ export default function Page() {
           <Edit
             size={24}
             className="absolute right-8 top-4 shrink-0 cursor-pointer"
-            onClick={() =>
-              document!.getElementById("edit-profile-modal")!.showModal()!
-            }
+            onClick={() => {
+              const modal = document.getElementById("edit-profile-modal");
+
+              if (modal instanceof HTMLDialogElement) {
+                modal.showModal();
+              } else {
+                console.warn("Element is not a <dialog>, can't call .close()");
+              }
+            }}
           />
           <CircleUserRound size={80} />
           <div className="flex flex-col">

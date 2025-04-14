@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import HeaderNavbar from "../../components/HeaderNavbar";
 import pocketbase_instance from "@/app/lib/pocketbase";
+import Link from "next/link";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ShieldAlert } from "lucide-react";
-import Link from "next/link";
 
 export default function ClientComponent({ data }: { data: any }) {
   const router = useRouter();

@@ -4,7 +4,6 @@ import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
 import Link from "next/link";
 
-import { useState } from "react";
 import { AlertCircle, FilePlus2, LoaderPinwheel } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 

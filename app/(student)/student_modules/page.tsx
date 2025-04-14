@@ -4,8 +4,7 @@ import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
 
 import { LoaderPinwheel, Search } from "lucide-react";
-import { RecordModel } from "pocketbase";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 

@@ -3,26 +3,24 @@
 import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LoaderPinwheel, Plus, ShieldAlert, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { RecordModel } from "pocketbase";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const router = useRouter();
   const user = pocketbase_instance.authStore.record!;
-  const [isInitialized, setIsInitialized] = useState(false);
 
   const [moduleID, setModuleID] = useState<string | null>("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<any>([]);
   const [errorMessage, setErrorMessage] = useState();
 
   const [posting, setPosting] = useState(false);
 
-  const { data: modules, refetch } = useQuery({
+  const { data: modules } = useQuery({
     queryKey: ["teacher_add_quiz"],
     queryFn: async () => {
       try {
@@ -140,7 +138,7 @@ export default function Page() {
           <Plus size={24} onClick={addQuestion} />
         </div>
 
-        {questions.map((q: any, qIndex) => (
+        {questions.map((q: any, qIndex: number) => (
           <div
             key={qIndex}
             className="flex flex-col gap-2 bg-gray-50 border border-gray-300 p-4 rounded-xl shadow"

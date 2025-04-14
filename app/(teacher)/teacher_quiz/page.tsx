@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
@@ -9,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function Page() {
   const user = pocketbase_instance.authStore.record!;
 
-  const { data: quiz } = useQuery({
+  const { data: quiz }: { data: any } = useQuery({
     queryKey: ["teacher_quiz"],
     queryFn: async () => {
       try {
@@ -59,7 +60,7 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody>
-                {quiz.map((item) => (
+                {quiz.map((item: any) => (
                   <tr key={item.id}>
                     <td>
                       <Link href={`/teacher_quiz/${item.id}`}>

@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import Link from "next/link";
 import pocketbase_instance from "@/app/lib/pocketbase";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "./actions";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -80,7 +80,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form action={login} className="basis-[50%] flex flex-col gap-4">
+        <form className="basis-[50%] flex flex-col gap-4">
           <h1 className="font-black text-xl">Login</h1>
 
           <input

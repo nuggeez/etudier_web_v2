@@ -60,14 +60,13 @@ export default function Page() {
                 key={quiz.id}
               >
                 <div className="flex flex-col gap-2">
-                <h1 className="font-bold text-xl">{quiz.title}</h1>
-                {quiz.course && (
-                  <p className="px-6 py-2 bg-gray-200 text-gray-500 w-fit rounded-3xl">
-                    {quiz.course}
-                  </p>
-                )}
+                  <h1 className="font-bold text-xl">{quiz.title}</h1>
+                  {quiz.course && (
+                    <p className="px-6 py-2 bg-gray-200 text-gray-500 w-fit rounded-3xl">
+                      {quiz.course}
+                    </p>
+                  )}
                 </div>
-                
                 <p className="text-gray-400">{quiz.description}</p>
               </Link>
             ))}

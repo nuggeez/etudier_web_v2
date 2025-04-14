@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import HeaderNavbar from "../components/HeaderNavbar";
@@ -19,7 +20,7 @@ export default function Page() {
   const router = useRouter();
   const user = pocketbase_instance.authStore.record!;
 
-  const { data, error, refetch } = useQuery({
+  const { data }: { data: any } = useQuery({
     queryKey: ["teacher_dashboard"],
     queryFn: async () => {
       try {

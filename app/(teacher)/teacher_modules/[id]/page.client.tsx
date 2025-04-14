@@ -21,7 +21,6 @@ export default function ClientComponent({ data }: { data: any }) {
         temp.push({ url: url, title: url.split("/").pop() });
       }
 
-
       return {
         thumbnail_url: pocketbase_instance.files.getURL(data, data.thumbnail),
         files: temp,

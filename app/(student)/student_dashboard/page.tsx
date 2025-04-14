@@ -2,7 +2,6 @@
 
 import HeaderNavbar from "../components/HeaderNavbar";
 
-import pocketbase_instance from "@/app/lib/pocketbase";
 import { FileIcon, ListIcon, LoaderPinwheel } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,7 +9,6 @@ import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
-  const user = pocketbase_instance.authStore.record!;
 
   const [isInitialized, setIsInitialized] = useState(false);
 
