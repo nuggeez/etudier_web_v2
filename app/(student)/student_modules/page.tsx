@@ -29,7 +29,6 @@ export default function Page() {
 
   const {
     data: searchQueryResults,
-    error: searchQueryError,
     refetch: searchQuery,
   }: { data: any; error: any; refetch: any } = useQuery({
     initialData: [],
