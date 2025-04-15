@@ -62,21 +62,29 @@ export default function ClientComponent({ data }: { data: any }) {
         </div>
       </div>
 
-      <h1 className="text-3xl font-black">Resources</h1>
-      <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
-        {files &&
-          files?.files.length > 0 &&
-          files.files.map((file: any, index: any) => (
-            <Link
-              href={file.url}
-              key={index}
-              className="flex gap-6 items-center text-sm text-gray-700 bg-gray-100 rounded-3xl p-6"
-            >
-              <Download size={24} />
-              <span>{file.title}</span>
-            </Link>
-          ))}
-      </div>
+      {files && files?.files == undefined && (
+        <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl items-center justify-center">
+          <h1 className="text-3xl font-black">No resources found.</h1>
+        </div>
+      )}
+
+      {files && files?.files.length > 0 && (
+        <>
+          <h1 className="text-3xl font-black">Resources</h1>
+          <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+            {files.files.map((file: any, index: any) => (
+              <Link
+                href={file.url}
+                key={index}
+                className="flex gap-6 items-center text-sm text-gray-700 bg-gray-100 rounded-3xl p-6"
+              >
+                <Download size={24} />
+                <span>{file.title}</span>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }

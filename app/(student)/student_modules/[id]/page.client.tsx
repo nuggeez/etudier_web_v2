@@ -11,6 +11,7 @@ import {
   Check,
   CheckCheckIcon,
   Download,
+  NotebookIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -25,7 +26,7 @@ export default function ClientComponent({ data }: { data: any }) {
   const [isMarking, setIsMarking] = useState(false);
 
   const { data: files } = useQuery({
-    queryKey: [data.id],
+    queryKey: ["module_files", data.id],
     queryFn: async () => {
       const temp = [];
       for (const file of data.contents) {
@@ -37,6 +38,23 @@ export default function ClientComponent({ data }: { data: any }) {
         files: temp,
         thumbnail_url: pocketbase_instance.files.getURL(data, data.thumbnail),
       };
+    },
+  });
+
+  const { data: quiz, error: noQuiz }: { data: any; error: any } = useQuery({
+    queryKey: ["module_quiz", data.id],
+    queryFn: async () => {
+      try {
+        const quiz = await pocketbase_instance!
+          .collection("quiz")
+          .getFullList({ filter: `module = '${data.id}'` });
+
+        console.log(quiz);
+
+        return quiz;
+      } catch (err) {
+        return err;
+      }
     },
   });
 
@@ -52,6 +70,8 @@ export default function ClientComponent({ data }: { data: any }) {
 
         setPercent(record.percent);
         setBookmark(record.bookmarked);
+
+        return 1;
       } catch (err: any) {
         console.log(err);
         return err;
@@ -190,7 +210,25 @@ export default function ClientComponent({ data }: { data: any }) {
               <span>{file.title}</span>
             </Link>
           ))}
+        {files && files?.files.length == 0 && <h1>No resources found.</h1>}
       </div>
+      {quiz && quiz.length > 0 && (
+        <>
+          <h1 className="text-3xl font-black">Quiz</h1>
+          <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+            {quiz.map((quiz: any, index: any) => (
+              <Link
+                href={`/student_quiz/${quiz.id}`}
+                key={index}
+                className="flex gap-6 items-center text-sm text-gray-700 bg-gray-100 rounded-3xl p-6"
+              >
+                <NotebookIcon size={24} />
+                <span>{quiz.title}</span>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }
