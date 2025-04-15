@@ -34,8 +34,12 @@ export default function Page() {
         <HeaderNavbar />
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-3xl font-bold">Your quizzes</h1>
-          <Link href={"/add_quiz"}>
+          <Link
+            href={"/add_quiz"}
+            className="btn btn-soft btn-success flex flex-row gap-4"
+          >
             <FilePlus2 size={24} className="cursor-pointer" />
+            <p>Create new quiz</p>
           </Link>
         </div>
         {quiz!.length == 0 && (
@@ -50,39 +54,24 @@ export default function Page() {
           </div>
         )}
         {quiz!.length > 0 && (
-          <div className="overflow-x-auto bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Quiz ID</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {quiz.map((item: any) => (
-                  <tr key={item.id}>
-                    <td>
-                      <Link href={`/teacher_quiz/${item.id}`}>
-                        <h1 className="font-bold">{item.id}</h1>
-                      </Link>
-                    </td>
-                    <td>
-                      <Link href={`/teacher_quiz/${item.id}`}>
-                        <h1 className="">{item.title}</h1>
-                      </Link>
-                    </td>
-                    <td>
-                      <Link href={`/teacher_quiz/${item.id}`}>
-                        <p className="text-sm text-wrap text-ellipsis">
-                          {item.description}
-                        </p>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-2 gap-4">
+            {quiz.map((quiz: any) => (
+              <Link
+                href={`/teacher_quiz/${quiz.id}`}
+                className="bg-gray-50 border border-gray-300 shadow-md p-6 rounded-3xl gap-2 flex flex-col gap-4 transition-all delay-0 duration-300 hover:-translate-y-2"
+                key={quiz.id}
+              >
+                <div className="flex flex-col gap-2">
+                  <h1 className="font-bold text-xl">{quiz.title}</h1>
+                  {quiz.course && (
+                    <p className="px-6 py-2 bg-gray-200 text-gray-500 w-fit rounded-3xl">
+                      {quiz.course}
+                    </p>
+                  )}
+                </div>
+                <p className="text-gray-400">{quiz.description}</p>
+              </Link>
+            ))}
           </div>
         )}
       </main>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import HeaderNavbar from "../../components/HeaderNavbar";
@@ -7,6 +8,7 @@ import Link from "next/link";
 import { ArrowLeft, Download, Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function ClientComponent({ data }: { data: any }) {
   const router = useRouter();
@@ -30,6 +32,15 @@ export default function ClientComponent({ data }: { data: any }) {
     refetchOnWindowFocus: false,
   });
 
+  const [title, setTitle] = useState(data.title);
+  const [description, setDescription] = useState(data.description);
+  const [course, setCourse] = useState(data.course);
+  const [imagePreviewURL, setImagePreviewURL] = useState(
+    files && files!.thumbnail_url ? files!.thumbnail_url : ""
+  );
+
+  const [isSaving, setIsSaving] = useState(false);
+
   return (
     <>
       <HeaderNavbar />
@@ -40,7 +51,19 @@ export default function ClientComponent({ data }: { data: any }) {
           className="cursor-pointer"
         />
         {user && user.id == data.teacher_id && (
-          <Edit size={24} onClick={() => {}} className="cursor-pointer" />
+          <Edit
+            size={24}
+            onClick={() => {
+              const modal = document.getElementById("edit-modal");
+
+              if (modal instanceof HTMLDialogElement) {
+                modal.showModal();
+              } else {
+                console.warn("Element is not a <dialog>, can't call .close()");
+              }
+            }}
+            className="cursor-pointer"
+          />
         )}
       </div>
       <div className="grid grid-cols-2 gap-8">
@@ -85,6 +108,122 @@ export default function ClientComponent({ data }: { data: any }) {
           </div>
         </>
       )}
+
+      <dialog id="edit-modal" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-xl mb-4">Edit Module</h3>
+          <form
+            className="flex flex-col gap-4 w-full"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const form = e.currentTarget;
+              const formData = new FormData(form);
+              setIsSaving(true);
+
+              try {
+                await pocketbase_instance
+                  .collection("modules")
+                  .update(data.id, formData);
+                const modal = document.getElementById("edit-modal");
+
+                if (modal instanceof HTMLDialogElement) {
+                  modal.showModal();
+                }
+
+                router.refresh();
+                window.location.reload();
+              } catch (err: any) {
+                alert("Failed to update module: " + err.message);
+              }
+            }}
+          >
+            <label className="flex flex-col gap-1">
+              <span className="font-semibold">Title</span>
+              <input
+                name="title"
+                type="text"
+                className="input w-full"
+                defaultValue={title}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="font-semibold">Course</span>
+              <input
+                name="course"
+                type="text"
+                className="input w-full"
+                defaultValue={course}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="font-semibold">Description</span>
+              <textarea
+                name="description"
+                className="textarea w-full resize-none"
+                defaultValue={description}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1 w-full">
+              <span className="font-semibold">
+                Resources (Upload new files)
+              </span>
+              <input
+                type="file"
+                name="contents"
+                multiple
+                className="file-input w-full"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1 w-full">
+              <span className="font-semibold">Thumbnail</span>
+              <input
+                type="file"
+                name="thumbnail"
+                accept="image/*"
+                className="file-input w-full"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setImagePreviewURL(URL.createObjectURL(file));
+                }}
+              />
+            </label>
+
+            {imagePreviewURL && (
+              <img
+                src={imagePreviewURL}
+                className="w-full aspect-square object-cover rounded-xl bg-gray-100"
+              />
+            )}
+
+            <div className="modal-action flex justify-end gap-2">
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  const modal = document.getElementById("edit-modal");
+
+                  if (modal instanceof HTMLDialogElement) {
+                    modal.close();
+                  }
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-success"
+                disabled={isSaving}
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </dialog>
     </>
   );
 }
