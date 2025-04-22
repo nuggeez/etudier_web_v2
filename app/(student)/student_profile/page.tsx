@@ -6,7 +6,7 @@ import HeaderNavbar from "../components/HeaderNavbar";
 
 import { CircleUserRound, Edit, LoaderPinwheel } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const user = pocketbase_instance.authStore.record!;
@@ -15,6 +15,8 @@ export default function Page() {
   const [school, setSchool] = useState(user ? user!.school : "");
   const [department, setDepartment] = useState(user ? user!.department : "");
   const [yearLevel, setYearLevel] = useState(user ? user!.year_level : "");
+  const [course, setCourse] = useState(user ? user!.course : "");
+  const [gender, setGender] = useState(user ? user!.gender : "");
 
   const { data } = useQuery({
     queryKey: ["student_profile", user ? user!.id : "user_id"],
@@ -67,7 +69,11 @@ export default function Page() {
     } catch (err: any) {}
   };
 
-  if (data)
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  if (data && user)
     return (
       <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4">
         <HeaderNavbar />
@@ -88,12 +94,10 @@ export default function Page() {
           <CircleUserRound size={80} />
           <div className="flex flex-col">
             <h1 className="text-3xl">{user!.name}</h1>
-            {user!.school && (
-              <p className="text-lg text-gray-500">Student at {user!.school}</p>
-            )}
-            {!user!.school && (
-              <p className="text-lg text-gray-500">{user!.account_type}</p>
-            )}
+            <p className="text-lg text-gray-500">Student at {user!.school}</p>
+            <p className="text-lg text-gray-500">{user!.gender}</p>
+            <p className="text-lg text-gray-500">{user!.course}</p>
+            <p className="text-lg text-gray-500">{user!.phone_number}</p>
             <p className="text-lg text-gray-500">ID: {user!.id}</p>
           </div>
         </div>

@@ -37,6 +37,7 @@ export default function Page() {
 
   useEffect(() => {
     const checkData = async () => {
+      console.log(user);
       setIsInitialized(true);
     };
 
@@ -70,6 +71,9 @@ export default function Page() {
             {!user!.school && (
               <p className="text-lg text-gray-500">{user!.account_type}</p>
             )}
+            <p className="text-lg text-gray-500">+63-{user!.phone_number}</p>
+            <p className="text-lg text-gray-500">{user!.qualifications}</p>
+            <p className="text-lg text-gray-500">{user!.subject_expertise}</p>
             <p className="text-lg text-gray-500">ID: {user!.id}</p>
           </div>
         </div>
