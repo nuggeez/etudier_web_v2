@@ -5,10 +5,10 @@ import HeaderNavbar from "../../components/HeaderNavbar";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import Link from "next/link";
 
-import { ArrowLeft, Download, Edit } from "lucide-react";
+import { ArrowLeft, Download, Edit, EyeIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ClientComponent({ data }: { data: any }) {
   const router = useRouter();
@@ -40,6 +40,10 @@ export default function ClientComponent({ data }: { data: any }) {
   );
 
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   return (
     <>
@@ -105,6 +109,22 @@ export default function ClientComponent({ data }: { data: any }) {
                 <span>{file.title}</span>
               </Link>
             ))}
+          </div>
+        </>
+      )}
+
+      {data.expand.quiz && (
+        <>
+          <h1 className="text-3xl font-black">Quiz</h1>
+          <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+            <Link
+              href={`/teacher_quiz/${data.expand.quiz.id}`}
+              key={data.expand.quiz.id}
+              className="flex gap-6 items-center text-sm text-gray-700 bg-gray-100 rounded-3xl p-6"
+            >
+              <EyeIcon size={24} />
+              <span>{data.expand.quiz.title}</span>
+            </Link>
           </div>
         </>
       )}

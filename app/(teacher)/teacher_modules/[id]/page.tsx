@@ -9,7 +9,7 @@ export default async function Page({
   const { id } = await params;
   const record = await pocketbase_instance
     .collection("modules")
-    .getOne(id, { expand: "users" });
+    .getOne(id, { expand: "teacher_id, quiz" });
 
   return (
     <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4">

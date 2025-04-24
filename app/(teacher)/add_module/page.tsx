@@ -6,12 +6,29 @@ import HeaderNavbar from "../components/HeaderNavbar";
 import Link from "next/link";
 
 import { useState } from "react";
-import { Trash } from "lucide-react";
+import { AlertTriangle, Cross, FileMinus2, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Page() {
   const router = useRouter();
   const user = pocketbase_instance.authStore.record!;
+
+  const { data: quizzes } = useQuery({
+    queryKey: ["quizzes", user!.id],
+    queryFn: async () => {
+      try {
+        const quizzes = await pocketbase_instance
+          .collection("quiz")
+          .getFullList({ filter: `teacher_id = '${user!.id}'` });
+
+        return quizzes;
+      } catch (err) {
+        throw err;
+      }
+    },
+    refetchOnWindowFocus: false,
+  });
 
   const [files, setFiles] = useState<File[]>();
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -21,6 +38,7 @@ export default function Page() {
   const [course, setCourse] = useState("");
   const [description, setDescription] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedQuiz, setSelectedQuiz] = useState("Pick a quiz");
 
   const [posting, setPosting] = useState(false);
 
@@ -61,6 +79,7 @@ export default function Page() {
     formData.append("course", course);
     formData.append("visible", String(visibility));
     formData.append("teacher_id", user.id);
+    formData.append("quiz", selectedQuiz != "Pick a quiz" ? selectedQuiz : "");
 
     if (thumbnail) {
       formData.append("thumbnail", thumbnail);
@@ -95,6 +114,12 @@ export default function Page() {
         </ul>
       </div>
       <h1 className="text-3xl font-bold">Module details</h1>
+      {errorMessage && (
+        <div className="flex flex-row gap-4 items-center p-8 bg-red-400 rounded-3xl">
+          <AlertTriangle size={36} className="text-white" />
+          <p className="text-white">{errorMessage}</p>
+        </div>
+      )}
       <div className="flex flex-col bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl gap-4">
         <label className="floating-label">
           <span>Module title</span>
@@ -147,6 +172,30 @@ export default function Page() {
           )}
         </div>
       </div>
+      <h1 className="text-3xl font-black">
+        Link module to your created quizzes
+      </h1>
+      {quizzes && (
+        <div className="flex flex-row gap-4 items-center">
+          <select
+            value={selectedQuiz}
+            onChange={(e) => setSelectedQuiz(e.target.value)}
+            className="select select-success w-full"
+          >
+            <option disabled={true}>Pick a quiz</option>
+            {quizzes.map((quiz, index) => (
+              <option key={quiz.id} value={quiz.id}>
+                {quiz.title}
+              </option>
+            ))}
+          </select>
+          <FileMinus2
+            size={24}
+            className="cursor-pointer"
+            onClick={() => setSelectedQuiz("Pick a quiz")}
+          />
+        </div>
+      )}
       <h1 className="text-3xl font-black">Resources/files</h1>
       <div className="flex items-center justify-center w-full">
         <label
