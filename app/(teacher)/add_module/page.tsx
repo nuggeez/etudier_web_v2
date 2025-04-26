@@ -6,7 +6,7 @@ import HeaderNavbar from "../components/HeaderNavbar";
 import Link from "next/link";
 
 import { useState } from "react";
-import { AlertTriangle, Cross, FileMinus2, Trash } from "lucide-react";
+import { AlertTriangle,  FileMinus2, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
@@ -27,7 +27,7 @@ export default function Page() {
         throw err;
       }
     },
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   });
 
   const [files, setFiles] = useState<File[]>();
