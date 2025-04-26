@@ -2,10 +2,10 @@
 "use client";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
+import Link from "next/link";
 
 import { ArrowUp, LoaderPinwheel, Search } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Page() {
@@ -20,7 +20,19 @@ export default function Page() {
           .collection("modules")
           .getList(1, 50, { filter: "visible = 1" });
 
-        return items;
+        const temp: any[] = [];
+
+        items.forEach((record) => {
+          temp.push({
+            ...record,
+            thumbnail_url: pocketbase_instance.files.getURL(
+              record,
+              record.thumbnail
+            ),
+          });
+        });
+
+        return temp;
       } catch (err) {
         return err;
       }

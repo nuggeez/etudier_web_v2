@@ -13,16 +13,22 @@ export default function Page() {
 
   const [name, setName] = useState(user ? user.name : "");
   const [school, setSchool] = useState(user ? user!.school : "");
+  const [subject_expertise, setSubjectExpertise] = useState(
+    user ? user!.subject_expertise : ""
+  );
+  const [qualifications, setQualifications] = useState(
+    user ? user!.year_level : ""
+  );
   const [department, setDepartment] = useState(user ? user!.department : "");
-  const [yearLevel, setYearLevel] = useState(user ? user!.year_level : "");
 
   const handleUpdateProfile = async () => {
     try {
       await pocketbase_instance.collection("users").update(user!.id, {
         name: name,
         school: school,
+        subject_expertise: subject_expertise,
+        qualifications: qualifications,
         department: department,
-        year_level: yearLevel,
       });
 
       const modal = document.getElementById("edit-profile-modal");
@@ -48,7 +54,7 @@ export default function Page() {
     return (
       <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4">
         <HeaderNavbar />
-        <div className="relative flex flex-row items-center justify-center gap-6 bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+        <div className="relative flex flex-row items-center justify-center gap-12 bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
           <Edit
             size={24}
             className="absolute right-8 top-4 shrink-0 cursor-pointer"
@@ -62,7 +68,10 @@ export default function Page() {
               }
             }}
           />
-          <CircleUserRound size={80} />
+          <div className="flex flex-col gap-4 items-center">
+            <CircleUserRound size={80} />
+            <p className="text-lg text-gray-500">ID: {user!.id}</p>
+          </div>
           <div className="flex flex-col">
             <h1 className="text-3xl">{user!.name}</h1>
             {user!.school && (
@@ -74,7 +83,6 @@ export default function Page() {
             <p className="text-lg text-gray-500">+63-{user!.phone_number}</p>
             <p className="text-lg text-gray-500">{user!.qualifications}</p>
             <p className="text-lg text-gray-500">{user!.subject_expertise}</p>
-            <p className="text-lg text-gray-500">ID: {user!.id}</p>
           </div>
         </div>
         <dialog id="edit-profile-modal" className="modal">
@@ -109,14 +117,21 @@ export default function Page() {
                 />
               </label>
               <label className="input w-full">
-                <span className="label">Year Level</span>
+                <span className="label">Subject Expertise</span>
                 <input
-                  type="number"
-                  min={1}
-                  max={4}
+                  type="text"
                   className="w-full"
-                  value={yearLevel}
-                  onChange={(e) => setYearLevel(e.target.value)}
+                  value={subject_expertise}
+                  onChange={(e) => setSubjectExpertise(e.target.value)}
+                />
+              </label>
+              <label className="input w-full">
+                <span className="label">Qualifications</span>
+                <input
+                  type="text"
+                  className="w-full"
+                  value={qualifications}
+                  onChange={(e) => setQualifications(e.target.value)}
                 />
               </label>
             </div>

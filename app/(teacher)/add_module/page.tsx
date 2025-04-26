@@ -15,7 +15,7 @@ export default function Page() {
   const user = pocketbase_instance.authStore.record!;
 
   const { data: quizzes } = useQuery({
-    queryKey: ["quizzes", user!.id],
+    queryKey: ["quizzes"],
     queryFn: async () => {
       try {
         const quizzes = await pocketbase_instance
