@@ -41,6 +41,28 @@ export default function ClientComponent({ data }: { data: any }) {
     setQuestions(updated);
   };
 
+  const deleteQuiz = async () => {
+    try {
+      const allSubmissions = await pocketbase_instance
+        .collection("users_quiz_submissions")
+        .getFullList({ filter: `quiz_id = '${data.id}'` });
+
+      allSubmissions.forEach(async (record) => {
+        await pocketbase_instance
+          .collection("users_quiz_submissions")
+          .delete(record.id);
+      });
+
+      await pocketbase_instance.collection("quiz").update(data.id, {
+        module: null,
+      });
+      await pocketbase_instance.collection("quiz").delete(data.id);
+      router.back();
+    } catch (err) {
+      alert(`Error deleting quiz: ${err}`);
+    }
+  };
+
   const saveChanges = async () => {
     setSaving(true);
     setErrorMessage(null);
@@ -68,12 +90,20 @@ export default function ClientComponent({ data }: { data: any }) {
           onClick={() => router.back()}
           className="cursor-pointer"
         />
-        <button
-          onClick={() => setIndex(1)}
-          className="btn btn-soft btn-primary btn-md"
-        >
-          Edit quiz
-        </button>
+        <div className="flex flex-row gap-4 items-center">
+          <button
+            onClick={() => setIndex(1)}
+            className="btn btn-soft btn-primary btn-md"
+          >
+            Edit quiz
+          </button>
+          <button
+            onClick={deleteQuiz}
+            className="btn btn-soft btn-warning btn-md"
+          >
+            Delete
+          </button>
+        </div>
       </div>
       <div>
         <h1 className="font-bold text-3xl">{data.title}</h1>

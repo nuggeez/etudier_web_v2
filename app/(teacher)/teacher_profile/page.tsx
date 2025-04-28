@@ -6,9 +6,11 @@ import HeaderNavbar from "../components/HeaderNavbar";
 
 import { CircleUserRound, Edit, LoaderPinwheel } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const user = pocketbase_instance.authStore.record!;
+  const router = useRouter();
   const [isInitialized, setIsInitialized] = useState(false);
 
   const [name, setName] = useState(user ? user.name : "");
@@ -30,6 +32,8 @@ export default function Page() {
         qualifications: qualifications,
         department: department,
       });
+      await pocketbase_instance.collection("users").authRefresh();
+      router.refresh();
 
       const modal = document.getElementById("edit-profile-modal");
 

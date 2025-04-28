@@ -5,10 +5,10 @@ import HeaderNavbar from "../../components/HeaderNavbar";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import Link from "next/link";
 
-import { ArrowLeft, Download, Edit, EyeIcon } from "lucide-react";
+import { ArrowLeft, Download, Edit, EyeIcon, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function ClientComponent({ data }: { data: any }) {
   const router = useRouter();
@@ -41,9 +41,25 @@ export default function ClientComponent({ data }: { data: any }) {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  const handleDelete = async () => {
+    try {
+      const allProgress = await pocketbase_instance
+        .collection("users_modules_progress")
+        .getFullList({ filter: `module_id = ${data.id}` });
+
+      allProgress.forEach(async (record) => {
+        await pocketbase_instance
+          .collection("users_modules_progress")
+          .delete(record.id);
+      });
+
+      await pocketbase_instance.collection("modules").delete(data.id);
+      router.back();
+    } catch (err) {
+      alert(`Error deleting module: ${err}`);
+      return;
+    }
+  };
 
   return (
     <>
@@ -54,21 +70,28 @@ export default function ClientComponent({ data }: { data: any }) {
           onClick={() => router.back()}
           className="cursor-pointer"
         />
-        {user && user.id == data.teacher_id && (
-          <Edit
-            size={24}
-            onClick={() => {
-              const modal = document.getElementById("edit-modal");
+        <div className="flex flex-row gap-4 items-center">
+          {user && user.id == data.teacher_id && (
+            <Edit
+              size={24}
+              onClick={() => {
+                const modal = document.getElementById("edit-modal");
 
-              if (modal instanceof HTMLDialogElement) {
-                modal.showModal();
-              } else {
-                console.warn("Element is not a <dialog>, can't call .close()");
-              }
-            }}
-            className="cursor-pointer"
-          />
-        )}
+                if (modal instanceof HTMLDialogElement) {
+                  modal.showModal();
+                } else {
+                  console.warn(
+                    "Element is not a <dialog>, can't call .close()"
+                  );
+                }
+              }}
+              className="cursor-pointer"
+            />
+          )}
+          {user && user.id == data.teacher_id && (
+            <Trash onClick={handleDelete} className="cursor-pointer" />
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-8">
         {files && (
