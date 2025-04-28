@@ -315,7 +315,7 @@ export default function RegisterPage() {
             type="text"
             required
             placeholder="Subject Expertise"
-            value={email}
+            value={expertise}
             onChange={(e) => setExpertise(e.target.value)}
           />
 
@@ -324,7 +324,7 @@ export default function RegisterPage() {
             type="text"
             required
             placeholder="Qualifications"
-            value={email}
+            value={qualifications}
             onChange={(e) => setQualifications(e.target.value)}
           />
 
