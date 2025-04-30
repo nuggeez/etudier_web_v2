@@ -1,21 +1,67 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import HeaderNavbar from "../../components/HeaderNavbar";
 import pocketbase_instance from "@/app/lib/pocketbase";
+import Link from "next/link";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-import { ArrowLeft, Plus, Trash, ShieldAlert } from "lucide-react";
+import {
+  ArrowLeft,
+  Plus,
+  Trash,
+  ShieldAlert,
+  NotebookIcon,
+} from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ClientComponent({ data }: { data: any }) {
   const router = useRouter();
+  const user = pocketbase_instance.authStore.record!;
 
   const [title, setTitle] = useState(data.title);
   const [description, setDescription] = useState(data.description);
   const [questions, setQuestions] = useState<any[]>(data.quiz || []);
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [moduleID, setModuleID] = useState<string | null>("");
+
+  const { data: modules }: { data: any } = useQuery({
+    queryKey: ["teacher_add_quiz"],
+    queryFn: async () => {
+      try {
+        const { items } = await pocketbase_instance
+          .collection("modules")
+          .getList(1, 50, { filter: `teacher_id="${user.id}"` });
+
+        return items;
+      } catch (err) {
+        console.error(err);
+        return err;
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+    enabled: !!user,
+  });
+
+  const { data: quiz, error: noQuiz }: { data: any; error: any } = useQuery({
+    queryKey: ["module_quiz", data.id],
+    queryFn: async () => {
+      try {
+        const quiz = await pocketbase_instance!
+          .collection("quiz")
+          .getFullList({ filter: `module = '${data.id}'` });
+
+        console.log(quiz);
+
+        return quiz;
+      } catch (err) {
+        return err;
+      }
+    },
+  });
 
   const updateQuestion = (index: number, field: keyof any, value: any) => {
     const updated = [...questions];
@@ -185,6 +231,31 @@ export default function ClientComponent({ data }: { data: any }) {
         <h1 className="text-2xl font-bold">Questions</h1>
         <Plus onClick={addQuestion} className="cursor-pointer" />
       </div>
+      {modules && (
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Modules</legend>
+          <select
+            value={moduleID!}
+            onChange={(e) => setModuleID(e.target.value)}
+            className="select w-full"
+            name="module"
+          >
+            <option disabled={true}>
+              Related to your modules? Select your module
+            </option>
+            <option value="">None</option>
+            {modules.map((module: any) => (
+              <option key={module.id} value={module.id}>
+                {module.title}
+              </option>
+            ))}
+          </select>
+          <span className="fieldset-label">
+            If this quiz is for your module or is atleast related, you can
+            select the module.
+          </span>
+        </fieldset>
+      )}
       {questions.map((q, qIndex) => (
         <div
           key={qIndex}
@@ -226,6 +297,7 @@ export default function ClientComponent({ data }: { data: any }) {
           </div>
         </div>
       ))}
+
       {errorMessage && (
         <div className="flex flex-row gap-4 items-center bg-red-500 text-white p-4 rounded-3xl">
           <ShieldAlert size={24} />

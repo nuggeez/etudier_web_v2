@@ -5,7 +5,7 @@ import HeaderNavbar from "../../components/HeaderNavbar";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import Link from "next/link";
 
-import { ArrowLeft, Download, Edit, EyeIcon, Trash } from "lucide-react";
+import { ArrowLeft, Download, Edit, EyeIcon, NotebookIcon, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -30,6 +30,23 @@ export default function ClientComponent({ data }: { data: any }) {
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
+  });
+
+  const { data: quiz, error: noQuiz }: { data: any; error: any } = useQuery({
+    queryKey: ["module_quiz", data.id],
+    queryFn: async () => {
+      try {
+        const quiz = await pocketbase_instance!
+          .collection("quiz")
+          .getFullList({ filter: `module = '${data.id}'` });
+
+        console.log(quiz);
+
+        return quiz;
+      } catch (err) {
+        return err;
+      }
+    },
   });
 
   const [title, setTitle] = useState(data.title);
@@ -121,7 +138,7 @@ export default function ClientComponent({ data }: { data: any }) {
       {files && files?.files.length > 0 && (
         <>
           <h1 className="text-3xl font-black">Resources</h1>
-          <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+          <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl gap flex flex-col gap-2">
             {files.files.map((file: any, index: any) => (
               <Link
                 href={file.url}
@@ -152,6 +169,24 @@ export default function ClientComponent({ data }: { data: any }) {
         </>
       )}
 
+      {quiz && quiz.length > 0 && (
+        <>
+          <h1 className="text-3xl font-black">Quiz</h1>
+          <div className="bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+            {quiz.map((quiz: any, index: any) => (
+              <Link
+                href={`/teacher_quiz/${quiz.id}`}
+                key={index}
+                className="flex gap-6 items-center text-sm text-gray-700 bg-gray-100 rounded-3xl p-6"
+              >
+                <NotebookIcon size={24} />
+                <span>{quiz.title}</span>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+
       <dialog id="edit-modal" className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-xl mb-4">Edit Module</h3>
@@ -170,12 +205,13 @@ export default function ClientComponent({ data }: { data: any }) {
                 const modal = document.getElementById("edit-modal");
 
                 if (modal instanceof HTMLDialogElement) {
-                  modal.showModal();
+                  modal.close();
                 }
 
                 router.refresh();
                 window.location.reload();
               } catch (err: any) {
+                setIsSaving(false);
                 alert("Failed to update module: " + err.message);
               }
             }}

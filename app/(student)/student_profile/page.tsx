@@ -3,6 +3,7 @@
 "use client";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
+import dayjs from "dayjs";
 
 import { CircleUserRound, Edit, LoaderPinwheel } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -77,7 +78,8 @@ export default function Page() {
     return (
       <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4">
         <HeaderNavbar />
-        <div className="relative flex flex-row items-center justify-center gap-6 bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+        <h1 className="font-bold text-3xl text-gray-600">Profile details</h1>
+        <div className="relative flex flex-row items-center justify-center gap-12 bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
           <Edit
             size={24}
             className="absolute right-8 top-4 shrink-0 cursor-pointer"
@@ -91,15 +93,35 @@ export default function Page() {
               }
             }}
           />
-          <CircleUserRound size={80} />
-          <div className="flex flex-col">
-            <h1 className="text-3xl">{user!.name}</h1>
-            <p className="text-lg text-gray-500">Student at {user!.school}</p>
-            <p className="text-lg text-gray-500">{user!.gender}</p>
-            <p className="text-lg text-gray-500">{user!.course}</p>
-            <p className="text-lg text-gray-500">{user!.phone_number}</p>
-            <p className="text-lg text-gray-500">ID: {user!.id}</p>
+          <div className="flex flex-col gap-4 items-center">
+            <CircleUserRound size={80} />
           </div>
+          <div className="flex flex-col">
+            <p className="text-lg text-gray-500">Student at {user!.school}</p>
+            <p className="text-lg text-gray-500">
+              ID: <b>{user!.id}</b>
+            </p>
+            <p className="text-lg text-gray-500">
+              Full Name: <b>{user!.name}</b>
+            </p>
+            <p className="text-lg text-gray-500">
+              Phone number: <b>+63-{user!.phone_number}</b>
+            </p>
+            <p className="text-lg text-gray-500">
+              Email: <b>{user!.email}</b>
+            </p>
+            <p className="text-lg text-gray-500">
+              Date of birth:{" "}
+              <b>
+                {dayjs(user!.date_of_birth).format("MMMM DD, YYYY").toString()}
+              </b>
+            </p>
+          </div>
+        </div>
+        <div className="relative flex flex-col gap-1 bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+          <p className="text-lg text-gray-500">
+            Department: <b>{user!.department}</b>
+          </p>
         </div>
         {data && (
           <>

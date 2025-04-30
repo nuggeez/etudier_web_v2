@@ -131,7 +131,6 @@ export default function Page() {
         <>
           <div className="flex flex-row justify-between items-center">
             <h1 className="text-3xl font-bold">Submissions on your quizzes</h1>
-            
           </div>
           {submissions!.length == 0 && (
             <div className="flex flex-col gap-4 items-center justify-center flex-1">

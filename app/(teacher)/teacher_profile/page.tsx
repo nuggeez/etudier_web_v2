@@ -3,6 +3,7 @@
 "use client";
 import pocketbase_instance from "@/app/lib/pocketbase";
 import HeaderNavbar from "../components/HeaderNavbar";
+import dayjs from "dayjs";
 
 import { CircleUserRound, Edit, LoaderPinwheel } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -58,6 +59,7 @@ export default function Page() {
     return (
       <main className="flex flex-col gap-4 max-w-3xl min-h-screen mx-auto py-4">
         <HeaderNavbar />
+        <h1 className="font-bold text-3xl text-gray-600">Profile details</h1>
         <div className="relative flex flex-row items-center justify-center gap-12 bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
           <Edit
             size={24}
@@ -77,17 +79,42 @@ export default function Page() {
             <p className="text-lg text-gray-500">ID: {user!.id}</p>
           </div>
           <div className="flex flex-col">
-            <h1 className="text-3xl">{user!.name}</h1>
             {user!.school && (
               <p className="text-lg text-gray-500">Teacher at {user!.school}</p>
             )}
-            {!user!.school && (
-              <p className="text-lg text-gray-500">{user!.account_type}</p>
-            )}
-            <p className="text-lg text-gray-500">+63-{user!.phone_number}</p>
-            <p className="text-lg text-gray-500">{user!.qualifications}</p>
-            <p className="text-lg text-gray-500">{user!.subject_expertise}</p>
+            <p className="text-lg text-gray-500">
+              ID: <b>{user!.id}</b>
+            </p>
+            <p className="text-lg text-gray-500">
+              Full Name: <b>{user!.name}</b>
+            </p>
+            <p className="text-lg text-gray-500">
+              Phone number: <b>+63-{user!.phone_number}</b>
+            </p>
+            <p className="text-lg text-gray-500">
+              Email: <b>{user!.email}</b>
+            </p>
+            <p className="text-lg text-gray-500">
+              Date of birth:{" "}
+              <b>
+                {dayjs(user!.date_of_birth).format("MMMM DD, YYYY").toString()}
+              </b>
+            </p>
           </div>
+        </div>
+        <div className="relative flex flex-col gap-1 bg-gray-50 border border-gray-300 shadow-md p-8 rounded-3xl">
+          {user!.school && (
+            <p className="text-lg text-gray-500">Teacher at {user!.school}</p>
+          )}
+          <p className="text-lg text-gray-500">
+            Department: <b>{user!.department}</b>
+          </p>
+          <p className="text-lg text-gray-500">
+            Subject Expertise: <b>{user!.subject_expertise}</b>
+          </p>
+          <p className="text-lg text-gray-500">
+            Qualifications: <b>{user!.qualifications}</b>
+          </p>
         </div>
         <dialog id="edit-profile-modal" className="modal">
           <div className="modal-box flex flex-col gap-4">
