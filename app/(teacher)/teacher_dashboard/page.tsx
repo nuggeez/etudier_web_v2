@@ -35,6 +35,7 @@ export default function Page() {
           .getList(1, 50, {
             filter: `teacher_id = '${user!.id}'`,
           });
+          
 
         return {
           quizCount: quizCount.items.length,
@@ -46,6 +47,22 @@ export default function Page() {
       }
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: enrolledStudentsData } = useQuery({
+    queryKey: ["enrolled_students"],
+    queryFn: async () => {
+      const { items } = await pocketbase_instance
+        .collection("module_enrollments")
+        .getList(1, 200, {
+          filter: `teacher = '${user!.id}'`,
+          expand: "student,module",
+        });
+  
+      return items;
+    },
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 
@@ -132,34 +149,35 @@ export default function Page() {
           </Link>
         </div>
 
-        {Array.isArray(studentsData) && studentsData!.length > 0 && (
-          <>
-            <h1 className="text-4xl font-bold">Students</h1>
-            <div className="overflow-x-auto rounded-box border border-base-content/5 shadow  bg-gray-50">
-              <table className="table">
-                {/* head */}
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Course</th>
-                    <th>School</th>
+              {Array.isArray(enrolledStudentsData) && enrolledStudentsData.length > 0 && (
+        <>
+          <h1 className="text-4xl font-bold">Enrolled Students</h1>
+          <div className="overflow-x-auto rounded-box border border-base-content/5 shadow bg-gray-50">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Course</th>
+                  <th>School</th>
+                  <th>Module</th>
+                </tr>
+              </thead>
+              <tbody>
+                {enrolledStudentsData.map((entry, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{entry.expand?.student?.name}</td>
+                    <td>{entry.expand?.student?.course}</td>
+                    <td>{entry.expand?.student?.school}</td>
+                    <td>{entry.expand?.module?.title}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {studentsData.map((student, index) => (
-                    <tr key={index}>
-                      <th>{index}</th>
-                      <th className="font-normal">{student.name}</th>
-                      <th className="font-normal">{student.course}</th>
-                      <th className="font-normal">{student.school}</th>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
       </main>
     );
   }
